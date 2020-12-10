@@ -8,6 +8,7 @@ package edu.upc.epsevg.prop.amazons.players;
 import edu.upc.epsevg.prop.amazons.*;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -30,7 +31,7 @@ public class PolloTruco implements IPlayer, IAuto {
     @Override
     public Move move(GameStatus s){
         CellType color = s.getCurrentPlayer();
-        int profMax = 2;
+        int profMax = 10;
         int valor = -100000, heu;
         Float alfa = Float.NEGATIVE_INFINITY, beta = Float.POSITIVE_INFINITY;
         Point queenFrom = new Point(0,0), queenTo = new Point(0,0), arrowTo = new Point(0,0);
@@ -63,6 +64,7 @@ public class PolloTruco implements IPlayer, IAuto {
                    }
                }
            }
+           System.out.print("Buscant en profunditat: "+prof+" \n");
         }
         //System.out.print("Amazonas: "+s.getNumberOfAmazonsForEachColor()+" \n");
         System.out.print("Color Amazonas: "+color+" \n");
@@ -94,7 +96,10 @@ public class PolloTruco implements IPlayer, IAuto {
                             valor = Math.min(valor, MaxValor(mov_arrow, profunditat-1, alfa, beta));
                             
                             beta=Math.min(valor,beta);
-                            if(beta<=alfa) return valor;
+                            if(beta<=alfa){
+                                //System.out.print("PODA\n");
+                                return valor;
+                            }
                         }
                     }
                 }
@@ -125,7 +130,10 @@ public class PolloTruco implements IPlayer, IAuto {
                             valor = Math.max(valor, MinValor(mov_arrow, profunditat-1, alfa, beta));
                             
                             alfa=Math.max(valor,alfa);
-                            if(beta<=alfa) return valor;
+                            if(beta<=alfa){
+                                //System.out.print("PODA\n");
+                                return valor;
+                            }
                         }
                     }
                 }
@@ -135,7 +143,10 @@ public class PolloTruco implements IPlayer, IAuto {
     }
 
     public int heuristica(GameStatus s, int profunditat){
-        return 0;
+        Random rand = new Random();
+        int p = rand.nextInt(50);
+        //System.out.print("Heu: "+p+" \n");
+        return p;
     }
 
     @Override
