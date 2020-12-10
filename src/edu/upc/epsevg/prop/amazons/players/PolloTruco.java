@@ -122,7 +122,7 @@ public class PolloTruco implements IPlayer, IAuto {
                 // Lista de posiciones vacias
                 for (int x = 0; x < s.getSize(); x++){
                     for (int y = 0; y < s.getSize(); y++){
-                        if (mov_queen.getPos(x, y)==CellType.EMPTY){
+                        if (mov_queen.getPos(x, y)==CellType.EMPTY && inTime){
                             GameStatus mov_arrow = new GameStatus(mov_queen);
                             mov_arrow.placeArrow(new Point(x, y));
                 
