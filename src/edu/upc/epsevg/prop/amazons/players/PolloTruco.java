@@ -36,6 +36,7 @@ public class PolloTruco implements IPlayer, IAuto {
         Point queenFrom = new Point(0,0), queenTo = new Point(0,0), arrowTo = new Point(0,0);
 
         // Todas las fichas del color
+        // nuevo comment
         for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
             Point pos = s.getAmazon(color, num);
             ArrayList<Point> arr = s.getAmazonMoves(pos, true);
