@@ -30,36 +30,39 @@ public class PolloTruco implements IPlayer, IAuto {
     @Override
     public Move move(GameStatus s){
         CellType color = s.getCurrentPlayer();
-        int prof = 2;
+        int profMax = 2;
         int valor = -100000, heu;
         Float alfa = Float.NEGATIVE_INFINITY, beta = Float.POSITIVE_INFINITY;
         Point queenFrom = new Point(0,0), queenTo = new Point(0,0), arrowTo = new Point(0,0);
 
-        // Todas las fichas del color
-        for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
-            Point pos = s.getAmazon(color, num);
-            ArrayList<Point> arr = s.getAmazonMoves(pos, true);
-            // Movimientos posibles
-            for (int i = 0; i < arr.size() && arr.size() > 0; i++){
-                GameStatus mov_queen = new GameStatus(s);
-                mov_queen.moveAmazon(pos, arr.get(i));
-                // Lista de posiciones vacias
-                for (int x = 0; x < s.getSize(); x++){
-                    for (int y = 0; y < s.getSize(); y++){
-                        if (mov_queen.getPos(x, y)==CellType.EMPTY){
-                            GameStatus mov_arrow = new GameStatus(mov_queen);
-                            mov_arrow.placeArrow(new Point(x, y));
-                            heu = MinValor(mov_arrow, prof-1, alfa, beta);
-                            if (valor < heu) {
-                                valor=heu;
-                                queenFrom=pos;
-                                queenTo=arr.get(i);
-                                arrowTo = new Point(x,y);
-                            }
-                        }
-                    }                    
-                }
-            }
+        // Profunditats de menys a més, ha de ser major a 0
+        for (int prof=1; prof <= profMax; prof++){
+            // Todas las fichas del color
+            for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
+               Point pos = s.getAmazon(color, num);
+               ArrayList<Point> arr = s.getAmazonMoves(pos, true);
+               // Movimientos posibles
+               for (int i = 0; i < arr.size() && arr.size() > 0; i++){
+                   GameStatus mov_queen = new GameStatus(s);
+                   mov_queen.moveAmazon(pos, arr.get(i));
+                   // Lista de posiciones vacias
+                   for (int x = 0; x < s.getSize(); x++){
+                       for (int y = 0; y < s.getSize(); y++){
+                           if (mov_queen.getPos(x, y)==CellType.EMPTY){
+                               GameStatus mov_arrow = new GameStatus(mov_queen);
+                               mov_arrow.placeArrow(new Point(x, y));
+                               heu = MinValor(mov_arrow, prof-1, alfa, beta);
+                               if (valor < heu) {
+                                   valor=heu;
+                                   queenFrom=pos;
+                                   queenTo=arr.get(i);
+                                   arrowTo = new Point(x,y);
+                               }
+                           }
+                       }                    
+                   }
+               }
+           }
         }
         //System.out.print("Amazonas: "+s.getNumberOfAmazonsForEachColor()+" \n");
         System.out.print("Color Amazonas: "+color+" \n");
