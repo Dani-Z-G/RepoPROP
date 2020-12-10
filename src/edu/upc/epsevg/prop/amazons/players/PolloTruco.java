@@ -23,7 +23,8 @@ public class PolloTruco implements IPlayer, IAuto {
     public PolloTruco (String name) {
         this.name = name;
     }
-    
+    //setNumerOfNodesExplored​(long numerOfNodesExplored);
+
     @Override
     public void timeout() {
         System.out.print("Timeout\n");
@@ -51,21 +52,26 @@ public class PolloTruco implements IPlayer, IAuto {
                    // Lista de posiciones vacias
                    for (int x = 0; x < s.getSize(); x++){
                        for (int y = 0; y < s.getSize(); y++){
-                           if (mov_queen.getPos(x, y)==CellType.EMPTY && inTime){
-                               GameStatus mov_arrow = new GameStatus(mov_queen);
-                               mov_arrow.placeArrow(new Point(x, y));
-                               heu = MinValor(mov_arrow, prof-1, alfa, beta);
-                               if (valor < heu) {
-                                   valor=heu;
-                                   queenFrom=pos;
-                                   queenTo=arr.get(i);
-                                   arrowTo = new Point(x,y);
-                               }
-                           }
-                       }                    
-                   }
-               }
-           }
+                           if (mov_queen.getPos(x, y)==CellType.EMPTY){
+                                GameStatus mov_arrow = new GameStatus(mov_queen);
+                                System.out.print("ENTRA\n");
+                                if (mov_arrow.getPos(x, y)==CellType.EMPTY){
+                                    mov_arrow.placeArrow(new Point(x, y));
+                                    System.out.print("BUSCA NOVA HURISTICA\n");
+                                    heu = MinValor(mov_arrow, prof-1, alfa, beta);
+                                    if (valor < heu) {
+                                        System.out.print("NOVA HURISTICA\n");
+                                        valor=heu;
+                                        queenFrom=pos;
+                                        queenTo=arr.get(i);
+                                        arrowTo = new Point(x,y);
+                                    }
+                                }
+                            }
+                        }                    
+                    }
+                }
+            }
            System.out.print("Buscant en profunditat: "+prof+" \n");
         }
         //System.out.print("Amazonas: "+s.getNumberOfAmazonsForEachColor()+" \n");
@@ -139,7 +145,20 @@ public class PolloTruco implements IPlayer, IAuto {
     }
 
     public int heuristica(GameStatus s, int profunditat){
-        return 0;
+        int valor=0, valor1=0, valor2=0;
+        for(int i=0; i<s.getNumberOfAmazonsForEachColor(); i++){
+            Point pos = s.getAmazon(CellType.PLAYER1, i);
+            valor1+=s.getAmazonMoves(pos, true).size();
+            
+            pos = s.getAmazon(CellType.PLAYER2, i);
+            valor2+=s.getAmazonMoves(pos, true).size();
+        }
+        if (s.getCurrentPlayer()==CellType.PLAYER1){
+            valor=valor1-valor2;
+        }else{
+            valor=valor2-valor1;
+        }
+        return valor;
     }
 
     @Override
