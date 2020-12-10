@@ -8,13 +8,14 @@ package edu.upc.epsevg.prop.amazons.players;
 import edu.upc.epsevg.prop.amazons.*;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  *
  * @author Dani
  */
 public class PolloTruco implements IPlayer, IAuto {
+    
+    private boolean inTime=true;
     
     private String name;
     //private GameStatus s;
@@ -25,7 +26,8 @@ public class PolloTruco implements IPlayer, IAuto {
     
     @Override
     public void timeout() {
-        // Nothing to do! I'm so fast, I never timeout 8-)
+        System.out.print("Timeout\n");
+        inTime=false;
     } 
    
     @Override
@@ -49,7 +51,7 @@ public class PolloTruco implements IPlayer, IAuto {
                    // Lista de posiciones vacias
                    for (int x = 0; x < s.getSize(); x++){
                        for (int y = 0; y < s.getSize(); y++){
-                           if (mov_queen.getPos(x, y)==CellType.EMPTY){
+                           if (mov_queen.getPos(x, y)==CellType.EMPTY && inTime){
                                GameStatus mov_arrow = new GameStatus(mov_queen);
                                mov_arrow.placeArrow(new Point(x, y));
                                heu = MinValor(mov_arrow, prof-1, alfa, beta);
@@ -89,17 +91,14 @@ public class PolloTruco implements IPlayer, IAuto {
                 // Lista de posiciones vacias
                 for (int x = 0; x < s.getSize(); x++){
                     for (int y = 0; y < s.getSize(); y++){
-                        if (mov_queen.getPos(x, y)==CellType.EMPTY){
+                        if (mov_queen.getPos(x, y)==CellType.EMPTY && inTime){
                             GameStatus mov_arrow = new GameStatus(mov_queen);
                             mov_arrow.placeArrow(new Point(x, y));
-                
+                           
                             valor = Math.min(valor, MaxValor(mov_arrow, profunditat-1, alfa, beta));
                             
                             beta=Math.min(valor,beta);
-                            if(beta<=alfa){
-                                //System.out.print("PODA\n");
-                                return valor;
-                            }
+                            if(beta<=alfa) return valor;
                         }
                     }
                 }
@@ -130,10 +129,7 @@ public class PolloTruco implements IPlayer, IAuto {
                             valor = Math.max(valor, MinValor(mov_arrow, profunditat-1, alfa, beta));
                             
                             alfa=Math.max(valor,alfa);
-                            if(beta<=alfa){
-                                //System.out.print("PODA\n");
-                                return valor;
-                            }
+                            if(beta<=alfa) return valor;
                         }
                     }
                 }
@@ -143,10 +139,7 @@ public class PolloTruco implements IPlayer, IAuto {
     }
 
     public int heuristica(GameStatus s, int profunditat){
-        Random rand = new Random();
-        int p = rand.nextInt(50);
-        //System.out.print("Heu: "+p+" \n");
-        return p;
+        return 0;
     }
 
     @Override
