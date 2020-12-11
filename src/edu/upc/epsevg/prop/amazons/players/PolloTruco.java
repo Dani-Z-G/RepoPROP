@@ -8,6 +8,7 @@ package edu.upc.epsevg.prop.amazons.players;
 import edu.upc.epsevg.prop.amazons.*;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -15,7 +16,7 @@ import java.util.ArrayList;
  */
 public class PolloTruco implements IPlayer, IAuto {
     
-    private boolean inTime=true;
+    private boolean inTime;
     
     private String name;
     //private GameStatus s;
@@ -33,6 +34,7 @@ public class PolloTruco implements IPlayer, IAuto {
    
     @Override
     public Move move(GameStatus s){
+        inTime=true;
         CellType color = s.getCurrentPlayer();
         int profMax = 10;
         int valor = -100000, heu;
@@ -44,7 +46,7 @@ public class PolloTruco implements IPlayer, IAuto {
             // Todas las fichas del color
             for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
                Point pos = s.getAmazon(color, num);
-               ArrayList<Point> arr = s.getAmazonMoves(pos, true);
+               ArrayList<Point> arr = s.getAmazonMoves(pos, false);
                // Movimientos posibles
                for (int i = 0; i < arr.size() && arr.size() > 0; i++){
                    GameStatus mov_queen = new GameStatus(s);
@@ -54,10 +56,10 @@ public class PolloTruco implements IPlayer, IAuto {
                        for (int y = 0; y < s.getSize(); y++){
                            if (mov_queen.getPos(x, y)==CellType.EMPTY){
                                 GameStatus mov_arrow = new GameStatus(mov_queen);
-                                System.out.print("ENTRA\n");
+                                //System.out.print("ENTRA\n");
                                 if (mov_arrow.getPos(x, y)==CellType.EMPTY){
                                     mov_arrow.placeArrow(new Point(x, y));
-                                    System.out.print("BUSCA NOVA HURISTICA\n");
+                                    //System.out.print("BUSCA NOVA HURISTICA\n");
                                     heu = MinValor(mov_arrow, prof-1, alfa, beta);
                                     if (valor < heu) {
                                         System.out.print("NOVA HURISTICA\n");
@@ -90,7 +92,7 @@ public class PolloTruco implements IPlayer, IAuto {
         int valor = 100000;
         for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
             Point pos = s.getAmazon(color, num);
-            ArrayList<Point> arr = s.getAmazonMoves(pos, true);
+            ArrayList<Point> arr = s.getAmazonMoves(pos, false);
             for (int i = 0; i < arr.size() && arr.size() > 0; i++){
                 GameStatus mov_queen = new GameStatus(s);
                 mov_queen.moveAmazon(pos, arr.get(i));
@@ -121,7 +123,7 @@ public class PolloTruco implements IPlayer, IAuto {
         int valor = -100000;
         for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
             Point pos = s.getAmazon(color, num);
-            ArrayList<Point> arr = s.getAmazonMoves(pos, true);
+            ArrayList<Point> arr = s.getAmazonMoves(pos, false);
             for (int i = 0; i < arr.size() && arr.size() > 0; i++){
                 GameStatus mov_queen = new GameStatus(s);
                 mov_queen.moveAmazon(pos, arr.get(i));
@@ -146,18 +148,23 @@ public class PolloTruco implements IPlayer, IAuto {
 
     public int heuristica(GameStatus s, int profunditat){
         int valor=0, valor1=0, valor2=0;
+        
         for(int i=0; i<s.getNumberOfAmazonsForEachColor(); i++){
             Point pos = s.getAmazon(CellType.PLAYER1, i);
-            valor1+=s.getAmazonMoves(pos, true).size();
+            valor1+=s.getAmazonMoves(pos, false).size();
             
             pos = s.getAmazon(CellType.PLAYER2, i);
-            valor2+=s.getAmazonMoves(pos, true).size();
+            valor2+=s.getAmazonMoves(pos, false).size();
         }
         if (s.getCurrentPlayer()==CellType.PLAYER1){
             valor=valor1-valor2;
         }else{
             valor=valor2-valor1;
         }
+        /*
+        Random rand = new Random();
+        valor = rand.nextInt(50);
+^       */
         return valor;
     }
 
