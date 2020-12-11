@@ -22,11 +22,13 @@ public class Amazons {
                 
                 //IPlayer player1 = new HumanPlayer("Snail");
                 //IPlayer player1 = new CarlinhosPlayer();
-                IPlayer player1 = new PolloTruco("1");
+                //IPlayer player1 = new PolloTruco("1");
+                IPlayer player1 = new RandomPlayer("");
+                
                 IPlayer player2 = new PolloTruco("2");
                 
-                new AmazonsBoard(player1 , player2, 10, Level.QUARTERBOARD);
-                //new AmazonsBoard(player1 , player2, 10, Level.FULL_BOARD);
+                //new AmazonsBoard(player1 , player2, 2, Level.QUARTERBOARD);
+                new AmazonsBoard(player1 , player2, 2, Level.FULL_BOARD);
                 //new AmazonsBoard(player1 , player2, 10, Level.HALF_BOARD);
                 
             }
