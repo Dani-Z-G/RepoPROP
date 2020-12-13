@@ -36,7 +36,7 @@ public class PolloTruco implements IPlayer, IAuto {
     public Move move(GameStatus s){
         inTime=true;
         CellType color = s.getCurrentPlayer();
-        int profMax = 10;
+        int profMax = 6;
         int valor = -100000, heu;
         Float alfa = Float.NEGATIVE_INFINITY, beta = Float.POSITIVE_INFINITY;
         Point queenFrom = new Point(0,0), queenTo = new Point(0,0), arrowTo = new Point(0,0);
@@ -54,9 +54,11 @@ public class PolloTruco implements IPlayer, IAuto {
                    // Lista de posiciones vacias
                    for (int x = 0; x < s.getSize(); x++){
                        for (int y = 0; y < s.getSize(); y++){
+                           //
                            if (mov_queen.getPos(x, y)==CellType.EMPTY){
                                 GameStatus mov_arrow = new GameStatus(mov_queen);
                                 //System.out.print("ENTRA\n");
+                                //
                                 if (mov_arrow.getPos(x, y)==CellType.EMPTY){
                                     mov_arrow.placeArrow(new Point(x, y));
                                     //System.out.print("BUSCA NOVA HURISTICA\n");
@@ -148,18 +150,19 @@ public class PolloTruco implements IPlayer, IAuto {
 
     public int heuristica(GameStatus s, int profunditat){
         int valor=0, valor1=0, valor2=0;
-        
         for(int i=0; i<s.getNumberOfAmazonsForEachColor(); i++){
             Point pos = s.getAmazon(CellType.PLAYER1, i);
-            valor1+=s.getAmazonMoves(pos, false).size();
+            valor1+=amazonHeu(s, pos);
+            //System.out.print("Heuristica: "+s.getAmazonMoves(pos, false)+" \n");
             
             pos = s.getAmazon(CellType.PLAYER2, i);
-            valor2+=s.getAmazonMoves(pos, false).size();
+            valor2+=amazonHeu(s, pos);
+            //System.out.print("Heuristica: "+s.getAmazonMoves(pos, false)+" \n");
         }
         if (s.getCurrentPlayer()==CellType.PLAYER1){
-            valor=valor1-valor2;
-        }else{
             valor=valor2-valor1;
+        }else{
+            valor=valor1-valor2;
         }
         /*
         Random rand = new Random();
@@ -168,6 +171,50 @@ public class PolloTruco implements IPlayer, IAuto {
         return valor;
     }
 
+    private int amazonHeu(GameStatus s, Point pos){
+        int valor = 0, i = 0;
+        int vR = 0, vL = 0, vU = 0, vD = 0, vRU = 0, vRD = 0, vLD = 0, vLU = 0;
+        
+        // ==== RECTES ====
+        // Dreta
+        for (i=0; s.getPos(pos.x+i, pos.y)==CellType.EMPTY && pos.x+i >= 0 && pos.x+i <= s.getSize(); i++){
+            vR = vR + 10^9-10^i;
+        }
+        // Esquerra
+        for (i=0; s.getPos(pos.x-i, pos.y)==CellType.EMPTY && pos.x-i >= 0 && pos.x-i <= s.getSize(); i++){
+            vL = vL + 10^9-10^i;
+        }
+        // Amunt
+        for (i=0; s.getPos(pos.x, pos.y+1)==CellType.EMPTY && pos.y+i >= 0 && pos.y+i <= s.getSize(); i++){
+            vU = vU + 10^9-10^i;
+        }
+        /*
+        // Abaix
+        for (i=0; s.getPos(pos.x, pos.y-1)==CellType.EMPTY && pos.y-i >= s.getSize() && pos.y-i <= s.getSize(); i++){
+            vD = vD + 10^9-10^i;
+        }
+        
+        // ==== DIAGONALS ====
+        // Dreta-Amunt
+        for (i=0; s.getPos(pos.x+i, pos.y-i)==CellType.EMPTY && pos.x+i >= s.getSize() && pos.x+i <= s.getSize() && pos.y-i >= s.getSize() && pos.y-i <= s.getSize(); i++){
+            vRU = vRU + 10^9-10^i;
+        }
+        // Dreta-Abaix
+        for (i=0; s.getPos(pos.x+i, pos.y+i)==CellType.EMPTY && pos.x+i >= s.getSize() && pos.x+i <= s.getSize() && pos.y+i >= s.getSize() && pos.y+i <= s.getSize(); i++){
+            vRD = vRD + 10^9-10^i;
+        }
+        // Esquerra-Abaix
+        for (i=0; s.getPos(pos.x-i, pos.y+i)==CellType.EMPTY && pos.x-i >= s.getSize() && pos.x-i <= s.getSize() && pos.y+i >= s.getSize() && pos.y+i <= s.getSize(); i++){
+            vLD = vLD + 10^9-10^i;
+        }
+        // Esquerra-Amunt
+        for (i=0; s.getPos(pos.x-i, pos.y-i)==CellType.EMPTY && pos.x-i >= s.getSize() && pos.x-i <= s.getSize() && pos.y-i >= s.getSize() && pos.y-i <= s.getSize(); i++){
+            vLU = vLU + 10^9-10^i;
+        }
+        */
+        return vR+vL+vU+vD+vRU+vRD+vLD+vLU;
+    }
+    
     @Override
     public String getName() {
         return name;
