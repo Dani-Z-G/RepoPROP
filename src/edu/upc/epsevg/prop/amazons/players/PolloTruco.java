@@ -36,8 +36,8 @@ public class PolloTruco implements IPlayer, IAuto {
     public Move move(GameStatus s){
         inTime=true;
         CellType color = s.getCurrentPlayer();
-        int profMax = 6;
-        int valor = -100000, heu;
+        int profMax = 2;
+        int valor = -999999999, heu;
         Float alfa = Float.NEGATIVE_INFINITY, beta = Float.POSITIVE_INFINITY;
         Point queenFrom = new Point(0,0), queenTo = new Point(0,0), arrowTo = new Point(0,0);
 
@@ -88,10 +88,13 @@ public class PolloTruco implements IPlayer, IAuto {
     private int MinValor(GameStatus s, int profunditat, float alfa, float beta){
         CellType color = s.getCurrentPlayer();
         if (profunditat == 0 || s.isGameOver()) {
+            if (s.isGameOver()){
+                return -999999999;
+            }
             // get winner
             return heuristica(s, profunditat);
         }
-        int valor = 100000;
+        int valor = 999999999;
         for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
             Point pos = s.getAmazon(color, num);
             ArrayList<Point> arr = s.getAmazonMoves(pos, false);
@@ -120,9 +123,12 @@ public class PolloTruco implements IPlayer, IAuto {
     private int MaxValor(GameStatus s, int profunditat, float alfa, float beta){
         CellType color = s.getCurrentPlayer();
         if (profunditat == 0 || s.isGameOver()) {
+            if (s.isGameOver()){
+                return 999999999;
+            }
             return heuristica(s, profunditat);
         }
-        int valor = -100000;
+        int valor = -999999999;
         for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
             Point pos = s.getAmazon(color, num);
             ArrayList<Point> arr = s.getAmazonMoves(pos, false);
@@ -152,16 +158,24 @@ public class PolloTruco implements IPlayer, IAuto {
         int valor=0, valor1=0, valor2=0;
         for(int i=0; i<s.getNumberOfAmazonsForEachColor(); i++){
             Point pos = s.getAmazon(CellType.PLAYER1, i);
-            valor1+=amazonHeu(s, pos);
+            if (s.getAmazonMoves(pos, false).size()!=0){
+                //System.out.print("Fitxa P1: "+i+" \n");
+                valor1+=amazonHeu(s, pos);
+            }
             //System.out.print("Heuristica: "+s.getAmazonMoves(pos, false)+" \n");
             
             pos = s.getAmazon(CellType.PLAYER2, i);
-            valor2+=amazonHeu(s, pos);
+            if (s.getAmazonMoves(pos, false).size()!=0){
+                //System.out.print("Fitxa P2: "+i+" \n");
+                valor2+=amazonHeu(s, pos);
+            }
             //System.out.print("Heuristica: "+s.getAmazonMoves(pos, false)+" \n");
         }
         if (s.getCurrentPlayer()==CellType.PLAYER1){
+            //valor=valor1-valor2;
             valor=valor2-valor1;
         }else{
+            //valor=valor2-valor1;
             valor=valor1-valor2;
         }
         /*
@@ -177,42 +191,56 @@ public class PolloTruco implements IPlayer, IAuto {
         
         // ==== RECTES ====
         // Dreta
-        for (i=0; s.getPos(pos.x+i, pos.y)==CellType.EMPTY && pos.x+i >= 0 && pos.x+i <= s.getSize(); i++){
+        System.out.print((s.getPos(pos.x+1, pos.y)==CellType.EMPTY)+"\n"); 
+        
+        for (i=1; pos.x+i >= 0 && pos.x+i <= s.getSize() &&  s.getPos(pos.x+i, pos.y)==CellType.EMPTY; i++){
+            System.out.print("Dreta\n"); 
             vR = vR + 10^9-10^i;
         }
         // Esquerra
-        for (i=0; s.getPos(pos.x-i, pos.y)==CellType.EMPTY && pos.x-i >= 0 && pos.x-i <= s.getSize(); i++){
+        for (i=1;  pos.x-i >= 0 && pos.x-i <= s.getSize() && s.getPos(pos.x-i, pos.y)==CellType.EMPTY; i++){
+            System.out.print("Esquerra\n"); 
             vL = vL + 10^9-10^i;
         }
         // Amunt
-        for (i=0; s.getPos(pos.x, pos.y+1)==CellType.EMPTY && pos.y+i >= 0 && pos.y+i <= s.getSize(); i++){
+        for (i=1;  pos.y+i >= 0 && pos.y+i <= s.getSize() && s.getPos(pos.x, pos.y+i)==CellType.EMPTY; i++){
+            System.out.print("Amunt\n"); 
             vU = vU + 10^9-10^i;
         }
-        /*
         // Abaix
-        for (i=0; s.getPos(pos.x, pos.y-1)==CellType.EMPTY && pos.y-i >= s.getSize() && pos.y-i <= s.getSize(); i++){
+        for (i=1; pos.y-i >= s.getSize() && pos.y-i <= s.getSize() && s.getPos(pos.x, pos.y-i)==CellType.EMPTY; i++){
+            System.out.print("Abaix\n"); 
             vD = vD + 10^9-10^i;
         }
         
         // ==== DIAGONALS ====
         // Dreta-Amunt
-        for (i=0; s.getPos(pos.x+i, pos.y-i)==CellType.EMPTY && pos.x+i >= s.getSize() && pos.x+i <= s.getSize() && pos.y-i >= s.getSize() && pos.y-i <= s.getSize(); i++){
+        for (i=1; pos.x+i >= s.getSize() && pos.x+i <= s.getSize() && pos.y-i >= s.getSize() && pos.y-i <= s.getSize() && s.getPos(pos.x+i, pos.y-i)==CellType.EMPTY; i++){
             vRU = vRU + 10^9-10^i;
         }
         // Dreta-Abaix
-        for (i=0; s.getPos(pos.x+i, pos.y+i)==CellType.EMPTY && pos.x+i >= s.getSize() && pos.x+i <= s.getSize() && pos.y+i >= s.getSize() && pos.y+i <= s.getSize(); i++){
+        for (i=1; pos.x+i >= s.getSize() && pos.x+i <= s.getSize() && pos.y+i >= s.getSize() && pos.y+i <= s.getSize() && s.getPos(pos.x+i, pos.y+i)==CellType.EMPTY; i++){
             vRD = vRD + 10^9-10^i;
         }
         // Esquerra-Abaix
-        for (i=0; s.getPos(pos.x-i, pos.y+i)==CellType.EMPTY && pos.x-i >= s.getSize() && pos.x-i <= s.getSize() && pos.y+i >= s.getSize() && pos.y+i <= s.getSize(); i++){
+        for (i=1; pos.x-i >= s.getSize() && pos.x-i <= s.getSize() && pos.y+i >= s.getSize() && pos.y+i <= s.getSize() && s.getPos(pos.x-i, pos.y+i)==CellType.EMPTY; i++){
             vLD = vLD + 10^9-10^i;
         }
         // Esquerra-Amunt
-        for (i=0; s.getPos(pos.x-i, pos.y-i)==CellType.EMPTY && pos.x-i >= s.getSize() && pos.x-i <= s.getSize() && pos.y-i >= s.getSize() && pos.y-i <= s.getSize(); i++){
+        for (i=1; pos.x-i >= s.getSize() && pos.x-i <= s.getSize() && pos.y-i >= s.getSize() && pos.y-i <= s.getSize() && s.getPos(pos.x-i, pos.y-i)==CellType.EMPTY; i++){
             vLU = vLU + 10^9-10^i;
         }
+        
+        valor = vR+vL+vU+vD+vRU+vRD+vLD+vLU;
+        /*
+        if (valor == -999999999){
+            return -999999999;
+        }
         */
-        return vR+vL+vU+vD+vRU+vRD+vLD+vLU;
+        //System.out.print(s.toString()+" \n");
+        System.out.print("Valorrrr: "+valor+" \n");
+        
+        return valor;
     }
     
     @Override
