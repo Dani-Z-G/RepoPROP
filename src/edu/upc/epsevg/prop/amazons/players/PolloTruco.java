@@ -18,6 +18,8 @@ public class PolloTruco implements IPlayer, IAuto {
     
     private boolean inTime;
     
+    private CellType jugadr;
+    
     private String name;
     //private GameStatus s;
     
@@ -36,7 +38,8 @@ public class PolloTruco implements IPlayer, IAuto {
     public Move move(GameStatus s){
         inTime=true;
         CellType color = s.getCurrentPlayer();
-        int profMax = 2;
+        jugadr=color;
+        int profMax = 50;
         int valor = -999999999, heu;
         Float alfa = Float.NEGATIVE_INFINITY, beta = Float.POSITIVE_INFINITY;
         Point queenFrom = new Point(0,0), queenTo = new Point(0,0), arrowTo = new Point(0,0);
@@ -64,7 +67,7 @@ public class PolloTruco implements IPlayer, IAuto {
                                     //System.out.print("BUSCA NOVA HURISTICA\n");
                                     heu = MinValor(mov_arrow, prof-1, alfa, beta);
                                     if (valor < heu) {
-                                        System.out.print("NOVA HURISTICA\n");
+                                        //System.out.print("NOVA HURISTICA\n");
                                         valor=heu;
                                         queenFrom=pos;
                                         queenTo=arr.get(i);
@@ -76,12 +79,12 @@ public class PolloTruco implements IPlayer, IAuto {
                     }
                 }
             }
-           System.out.print("Buscant en profunditat: "+prof+" \n");
+           //System.out.print("Buscant en profunditat: "+prof+" \n");
         }
         //System.out.print("Amazonas: "+s.getNumberOfAmazonsForEachColor()+" \n");
-        System.out.print("Color Amazonas: "+color+" \n");
-        System.out.print("Lista Amazonas: "+s.getAmazon(color, 0)+" \n");
-        System.out.print("block: "+queenFrom+" "+queenTo+" "+arrowTo+" \n");
+        //System.out.print("Color Amazonas: "+color+" \n");
+        //System.out.print("Lista Amazonas: "+s.getAmazon(color, 0)+" \n");
+        //System.out.print("block: "+queenFrom+" "+queenTo+" "+arrowTo+" \n");
         return new Move(queenFrom, queenTo, arrowTo, 0, 0, SearchType.MINIMAX);
     }
 
@@ -89,12 +92,12 @@ public class PolloTruco implements IPlayer, IAuto {
         CellType color = s.getCurrentPlayer();
         if (profunditat == 0 || s.isGameOver()) {
             if (s.isGameOver()){
-                return -999999999;
+                return (999999999+profunditat);
             }
             // get winner
             return heuristica(s, profunditat);
         }
-        int valor = 999999999;
+        int valor = -999999999;
         for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
             Point pos = s.getAmazon(color, num);
             ArrayList<Point> arr = s.getAmazonMoves(pos, false);
@@ -105,9 +108,10 @@ public class PolloTruco implements IPlayer, IAuto {
                 for (int x = 0; x < s.getSize(); x++){
                     for (int y = 0; y < s.getSize(); y++){
                         if (mov_queen.getPos(x, y)==CellType.EMPTY && inTime){
+                            System.out.print("Time\n");
+                            
                             GameStatus mov_arrow = new GameStatus(mov_queen);
                             mov_arrow.placeArrow(new Point(x, y));
-                           
                             valor = Math.min(valor, MaxValor(mov_arrow, profunditat-1, alfa, beta));
                             
                             beta=Math.min(valor,beta);
@@ -124,11 +128,11 @@ public class PolloTruco implements IPlayer, IAuto {
         CellType color = s.getCurrentPlayer();
         if (profunditat == 0 || s.isGameOver()) {
             if (s.isGameOver()){
-                return 999999999;
+                return -(999999999+profunditat);
             }
             return heuristica(s, profunditat);
         }
-        int valor = -999999999;
+        int valor = 999999999;
         for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
             Point pos = s.getAmazon(color, num);
             ArrayList<Point> arr = s.getAmazonMoves(pos, false);
@@ -139,6 +143,8 @@ public class PolloTruco implements IPlayer, IAuto {
                 for (int x = 0; x < s.getSize(); x++){
                     for (int y = 0; y < s.getSize(); y++){
                         if (mov_queen.getPos(x, y)==CellType.EMPTY && inTime){
+                            System.out.print("Time\n");
+                            
                             GameStatus mov_arrow = new GameStatus(mov_queen);
                             mov_arrow.placeArrow(new Point(x, y));
                 
@@ -182,7 +188,8 @@ public class PolloTruco implements IPlayer, IAuto {
         Random rand = new Random();
         valor = rand.nextInt(50);
 ^       */
-        return valor;
+        if (profunditat%2==0) return -valor;
+        else return valor;
     }
 
     private int amazonHeu(GameStatus s, Point pos){
@@ -191,54 +198,57 @@ public class PolloTruco implements IPlayer, IAuto {
         
         // ==== RECTES ====
         // Dreta
-        System.out.print((s.getPos(pos.x+1, pos.y)==CellType.EMPTY)+"\n"); 
-        
-        for (i=1; s.getPos(pos.x+i, pos.y)==CellType.EMPTY && pos.x+i >= 0 && pos.x+i <= s.getSize(); i++){
-            System.out.print("Dreta\n"); 
-            vR = vR + 10^9-10^i;
+        for (i=1; pos.x+i >= 0 && pos.x+i < s.getSize(); i++){
+            if (s.getPos(pos.x+i, pos.y)==CellType.EMPTY){
+                vR = vR + 10^9-10^i;
+            }
         }
         // Esquerra
-        for (i=1; s.getPos(pos.x-i, pos.y)==CellType.EMPTY && pos.x-i >= 0 && pos.x-i <= s.getSize(); i++){
-            System.out.print("Esquerra\n"); 
-            vL = vL + 10^9-10^i;
+        for (i=1; pos.x-i >= 0 && pos.x-i < s.getSize(); i++){
+            if (s.getPos(pos.x-i, pos.y)==CellType.EMPTY){
+                vL = vL + 10^9-10^i;
+            }
         }
         // Amunt
-        for (i=1; s.getPos(pos.x, pos.y+i)==CellType.EMPTY && pos.y+i >= 0 && pos.y+i <= s.getSize(); i++){
-            System.out.print("Amunt\n"); 
-            vU = vU + 10^9-10^i;
+        for (i=1; pos.y+i >= 0 && pos.y+i < s.getSize(); i++){
+            if (s.getPos(pos.x, pos.y+i)==CellType.EMPTY){
+                vU = vU + 10^9-10^i;  
+            }
         }
         // Abaix
-        for (i=1; s.getPos(pos.x, pos.y-i)==CellType.EMPTY && pos.y-i >= s.getSize() && pos.y-i <= s.getSize(); i++){
-            System.out.print("Abaix\n"); 
-            vD = vD + 10^9-10^i;
+        for (i=1; pos.y-i >= s.getSize() && pos.y-i < s.getSize(); i++){
+            if (s.getPos(pos.x, pos.y-i)==CellType.EMPTY){
+                vD = vD + 10^9-10^i;
+            }
         }
         
         // ==== DIAGONALS ====
         // Dreta-Amunt
-        for (i=1; s.getPos(pos.x+i, pos.y-i)==CellType.EMPTY && pos.x+i >= s.getSize() && pos.x+i <= s.getSize() && pos.y-i >= s.getSize() && pos.y-i <= s.getSize(); i++){
-            vRU = vRU + 10^9-10^i;
+        for (i=1; pos.x+i >= 0 && pos.x+i < s.getSize() && pos.y-i >= 0 && pos.y-i < s.getSize(); i++){
+            if (s.getPos(pos.x+i, pos.y-i)==CellType.EMPTY){
+                vRU = vRU + 10^9-10^i;
+            }
         }
         // Dreta-Abaix
-        for (i=1; s.getPos(pos.x+i, pos.y+i)==CellType.EMPTY && pos.x+i >= s.getSize() && pos.x+i <= s.getSize() && pos.y+i >= s.getSize() && pos.y+i <= s.getSize(); i++){
-            vRD = vRD + 10^9-10^i;
+        for (i=1; pos.x+i >= 0 && pos.x+i < s.getSize() && pos.y+i >= 0 && pos.y+i < s.getSize(); i++){
+            if (s.getPos(pos.x+i, pos.y+i)==CellType.EMPTY){
+                vRD = vRD + 10^9-10^i;
+            }
         }
         // Esquerra-Abaix
-        for (i=1; s.getPos(pos.x-i, pos.y+i)==CellType.EMPTY && pos.x-i >= s.getSize() && pos.x-i <= s.getSize() && pos.y+i >= s.getSize() && pos.y+i <= s.getSize(); i++){
-            vLD = vLD + 10^9-10^i;
+        for (i=1; pos.x-i >= 0 && pos.x-i < s.getSize() && pos.y+i >= 0 && pos.y+i < s.getSize(); i++){
+            if (s.getPos(pos.x-i, pos.y+i)==CellType.EMPTY){
+                vLD = vLD + 10^9-10^i;
+            }
         }
         // Esquerra-Amunt
-        for (i=1; s.getPos(pos.x-i, pos.y-i)==CellType.EMPTY && pos.x-i >= s.getSize() && pos.x-i <= s.getSize() && pos.y-i >= s.getSize() && pos.y-i <= s.getSize(); i++){
-            vLU = vLU + 10^9-10^i;
+        for (i=1; pos.x-i >= 0 && pos.x-i < s.getSize() && pos.y-i >= 0 && pos.y-i < s.getSize(); i++){
+            if (s.getPos(pos.x-i, pos.y-i)==CellType.EMPTY){
+                vLU = vLU + 10^9-10^i;
+            }
         }
         
         valor = vR+vL+vU+vD+vRU+vRD+vLD+vLU;
-        /*
-        if (valor == -999999999){
-            return -999999999;
-        }
-        */
-        //System.out.print(s.toString()+" \n");
-        System.out.print("Valorrrr: "+valor+" \n");
         
         return valor;
     }
