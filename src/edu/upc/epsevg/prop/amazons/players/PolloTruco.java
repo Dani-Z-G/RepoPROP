@@ -39,8 +39,8 @@ public class PolloTruco implements IPlayer, IAuto {
         inTime=true;
         CellType color = s.getCurrentPlayer();
         jugadr = color;
-        int profMax = 2;
-        int valor = -999999999, heu;
+        int profMax = 100;
+        int valor = -1000000, heu;
         Float alfa = Float.NEGATIVE_INFINITY, beta = Float.POSITIVE_INFINITY;
         Point queenFrom = new Point(0,0), queenTo = new Point(0,0), arrowTo = new Point(0,0);
 
@@ -57,15 +57,12 @@ public class PolloTruco implements IPlayer, IAuto {
                    // Lista de posiciones vacias
                    for (int x = 0; x < s.getSize(); x++){
                        for (int y = 0; y < s.getSize(); y++){
-                           //
                            if (mov_queen.getPos(x, y)==CellType.EMPTY){
                                 GameStatus mov_arrow = new GameStatus(mov_queen);
-                                //System.out.print("ENTRA\n");
-                                //
                                 if (mov_arrow.getPos(x, y)==CellType.EMPTY){
                                     mov_arrow.placeArrow(new Point(x, y));
                                     //System.out.print("BUSCA NOVA HURISTICA\n");
-                                    heu = MinValor(mov_arrow, prof-1, alfa, beta);
+                                    heu = MinValor(mov_arrow, prof-1, alfa, beta)*(profMax-prof+1);
                                     if (valor < heu) {
                                         //System.out.print("NOVA HURISTICA\n");
                                         valor=heu;
@@ -80,7 +77,8 @@ public class PolloTruco implements IPlayer, IAuto {
                 }
             }
            //System.out.print("Buscant en profunditat: "+prof+" \n");
-        }/*
+        }
+        /*
         //System.out.print("Amazonas: "+s.getNumberOfAmazonsForEachColor()+" \n");
         System.out.print("Color Amazonas: "+color+" \n");
         System.out.print("Lista Amazonas: "+s.getAmazon(color, 0)+" \n");
@@ -93,12 +91,12 @@ public class PolloTruco implements IPlayer, IAuto {
         CellType color = s.getCurrentPlayer();
         if (profunditat == 0 || s.isGameOver()) {
             if (s.isGameOver()){
-                return 999999999;
+                return 1000000;
             }
             // get winner
             return heuristica(s, profunditat);
         }
-        int valor = -999999999;
+        int valor = -1000000;
         for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
             Point pos = s.getAmazon(color, num);
             ArrayList<Point> arr = s.getAmazonMoves(pos, false);
@@ -128,11 +126,11 @@ public class PolloTruco implements IPlayer, IAuto {
         CellType color = s.getCurrentPlayer();
         if (profunditat == 0 || s.isGameOver()) {
             if (s.isGameOver()){
-                return -999999999;
+                return -1000000;
             }
             return heuristica(s, profunditat);
         }
-        int valor = 999999999;
+        int valor = 1000000;
         for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
             Point pos = s.getAmazon(color, num);
             ArrayList<Point> arr = s.getAmazonMoves(pos, false);
@@ -184,24 +182,12 @@ public class PolloTruco implements IPlayer, IAuto {
                    aux1=(arr1.size())*1;
                    heurPL2 = heurPL2 + aux + aux1;
         }  
-        /*
-        if(s.getCurrentPlayer()==CellType.PLAYER1){
-            heur=heurPL1-heurPL2; 
-            System.out.println("Entra222222");
-            return heur;
-        }
-        else if(s.getCurrentPlayer()==CellType.PLAYER2){
-            heur=heurPL2-heurPL1;
-            System.out.println("Entra");
-            return heur;
-        }
-        */
-        if (jugadr==CellType.PLAYER2){
-            heur=heurPL2-heurPL1;
-        }else{
+        
+        if (jugadr==CellType.PLAYER1){
             heur=heurPL1-heurPL2;
+        }else{
+            heur=heurPL2-heurPL1;
         }
-        //System.out.println(heur);
         return heur;
     }
 
