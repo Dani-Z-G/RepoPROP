@@ -18,8 +18,6 @@ public class PolloTruco implements IPlayer, IAuto {
     
     private boolean inTime;
     
-    private CellType jugadr;
-    
     private String name;
     //private GameStatus s;
     
@@ -38,14 +36,13 @@ public class PolloTruco implements IPlayer, IAuto {
     public Move move(GameStatus s){
         inTime=true;
         CellType color = s.getCurrentPlayer();
-        jugadr=color;
         int profMax = 50;
         int valor = -999999999, heu;
         Float alfa = Float.NEGATIVE_INFINITY, beta = Float.POSITIVE_INFINITY;
         Point queenFrom = new Point(0,0), queenTo = new Point(0,0), arrowTo = new Point(0,0);
 
         // Profunditats de menys a més, ha de ser major a 0
-        for (int prof=1; prof <= profMax; prof++){
+        for (int prof=1; prof <= profMax && inTime; prof++){
             // Todas las fichas del color
             for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
                Point pos = s.getAmazon(color, num);
@@ -108,7 +105,7 @@ public class PolloTruco implements IPlayer, IAuto {
                 for (int x = 0; x < s.getSize(); x++){
                     for (int y = 0; y < s.getSize(); y++){
                         if (mov_queen.getPos(x, y)==CellType.EMPTY && inTime){
-                            System.out.print("Time\n");
+                            //System.out.print("Time\n");
                             
                             GameStatus mov_arrow = new GameStatus(mov_queen);
                             mov_arrow.placeArrow(new Point(x, y));
@@ -143,7 +140,7 @@ public class PolloTruco implements IPlayer, IAuto {
                 for (int x = 0; x < s.getSize(); x++){
                     for (int y = 0; y < s.getSize(); y++){
                         if (mov_queen.getPos(x, y)==CellType.EMPTY && inTime){
-                            System.out.print("Time\n");
+                            //System.out.print("Time\n");
                             
                             GameStatus mov_arrow = new GameStatus(mov_queen);
                             mov_arrow.placeArrow(new Point(x, y));
@@ -165,29 +162,19 @@ public class PolloTruco implements IPlayer, IAuto {
         for(int i=0; i<s.getNumberOfAmazonsForEachColor(); i++){
             Point pos = s.getAmazon(CellType.PLAYER1, i);
             if (s.getAmazonMoves(pos, false).size()!=0){
-                //System.out.print("Fitxa P1: "+i+" \n");
                 valor1+=amazonHeu(s, pos);
             }
-            //System.out.print("Heuristica: "+s.getAmazonMoves(pos, false)+" \n");
             
             pos = s.getAmazon(CellType.PLAYER2, i);
             if (s.getAmazonMoves(pos, false).size()!=0){
-                //System.out.print("Fitxa P2: "+i+" \n");
                 valor2+=amazonHeu(s, pos);
             }
-            //System.out.print("Heuristica: "+s.getAmazonMoves(pos, false)+" \n");
         }
         if (s.getCurrentPlayer()==CellType.PLAYER1){
-            //valor=valor1-valor2;
             valor=valor2-valor1;
         }else{
-            //valor=valor2-valor1;
             valor=valor1-valor2;
         }
-        /*
-        Random rand = new Random();
-        valor = rand.nextInt(50);
-^       */
         if (profunditat%2==0) return -valor;
         else return valor;
     }
