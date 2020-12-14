@@ -193,41 +193,41 @@ public class PolloTruco implements IPlayer, IAuto {
         // Dreta
         System.out.print((s.getPos(pos.x+1, pos.y)==CellType.EMPTY)+"\n"); 
         
-        for (i=1; pos.x+i >= 0 && pos.x+i <= s.getSize() &&  s.getPos(pos.x+i, pos.y)==CellType.EMPTY; i++){
+        for (i=1; s.getPos(pos.x+i, pos.y)==CellType.EMPTY && pos.x+i >= 0 && pos.x+i <= s.getSize(); i++){
             System.out.print("Dreta\n"); 
             vR = vR + 10^9-10^i;
         }
         // Esquerra
-        for (i=1;  pos.x-i >= 0 && pos.x-i <= s.getSize() && s.getPos(pos.x-i, pos.y)==CellType.EMPTY; i++){
+        for (i=1; s.getPos(pos.x-i, pos.y)==CellType.EMPTY && pos.x-i >= 0 && pos.x-i <= s.getSize(); i++){
             System.out.print("Esquerra\n"); 
             vL = vL + 10^9-10^i;
         }
         // Amunt
-        for (i=1;  pos.y+i >= 0 && pos.y+i <= s.getSize() && s.getPos(pos.x, pos.y+i)==CellType.EMPTY; i++){
+        for (i=1; s.getPos(pos.x, pos.y+i)==CellType.EMPTY && pos.y+i >= 0 && pos.y+i <= s.getSize(); i++){
             System.out.print("Amunt\n"); 
             vU = vU + 10^9-10^i;
         }
         // Abaix
-        for (i=1; pos.y-i >= s.getSize() && pos.y-i <= s.getSize() && s.getPos(pos.x, pos.y-i)==CellType.EMPTY; i++){
+        for (i=1; s.getPos(pos.x, pos.y-i)==CellType.EMPTY && pos.y-i >= s.getSize() && pos.y-i <= s.getSize(); i++){
             System.out.print("Abaix\n"); 
             vD = vD + 10^9-10^i;
         }
         
         // ==== DIAGONALS ====
         // Dreta-Amunt
-        for (i=1; pos.x+i >= s.getSize() && pos.x+i <= s.getSize() && pos.y-i >= s.getSize() && pos.y-i <= s.getSize() && s.getPos(pos.x+i, pos.y-i)==CellType.EMPTY; i++){
+        for (i=1; s.getPos(pos.x+i, pos.y-i)==CellType.EMPTY && pos.x+i >= s.getSize() && pos.x+i <= s.getSize() && pos.y-i >= s.getSize() && pos.y-i <= s.getSize(); i++){
             vRU = vRU + 10^9-10^i;
         }
         // Dreta-Abaix
-        for (i=1; pos.x+i >= s.getSize() && pos.x+i <= s.getSize() && pos.y+i >= s.getSize() && pos.y+i <= s.getSize() && s.getPos(pos.x+i, pos.y+i)==CellType.EMPTY; i++){
+        for (i=1; s.getPos(pos.x+i, pos.y+i)==CellType.EMPTY && pos.x+i >= s.getSize() && pos.x+i <= s.getSize() && pos.y+i >= s.getSize() && pos.y+i <= s.getSize(); i++){
             vRD = vRD + 10^9-10^i;
         }
         // Esquerra-Abaix
-        for (i=1; pos.x-i >= s.getSize() && pos.x-i <= s.getSize() && pos.y+i >= s.getSize() && pos.y+i <= s.getSize() && s.getPos(pos.x-i, pos.y+i)==CellType.EMPTY; i++){
+        for (i=1; s.getPos(pos.x-i, pos.y+i)==CellType.EMPTY && pos.x-i >= s.getSize() && pos.x-i <= s.getSize() && pos.y+i >= s.getSize() && pos.y+i <= s.getSize(); i++){
             vLD = vLD + 10^9-10^i;
         }
         // Esquerra-Amunt
-        for (i=1; pos.x-i >= s.getSize() && pos.x-i <= s.getSize() && pos.y-i >= s.getSize() && pos.y-i <= s.getSize() && s.getPos(pos.x-i, pos.y-i)==CellType.EMPTY; i++){
+        for (i=1; s.getPos(pos.x-i, pos.y-i)==CellType.EMPTY && pos.x-i >= s.getSize() && pos.x-i <= s.getSize() && pos.y-i >= s.getSize() && pos.y-i <= s.getSize(); i++){
             vLU = vLU + 10^9-10^i;
         }
         
