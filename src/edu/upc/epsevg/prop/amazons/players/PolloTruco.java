@@ -172,8 +172,8 @@ public class PolloTruco implements IPlayer, IAuto {
                    aux1=s.getAmazonMoves(p, false).size()*1;
                    heurPL1 = heurPL1 + aux + aux1;
                    */
-                   if (!s.getAmazonMoves(p, false).isEmpty()) enJoc1++;
-                   heurPL1+=amazonHeu(s, p)/*+(int)Math.pow(enJoc1,8)*/;
+                   /*if (!s.getAmazonMoves(p, false).isEmpty()) enJoc1++;*/
+                   heurPL1+=amazonHeu(s, p)/*+(int)Math.pow(10,7)*enJoc1*/;
         }
         //PLAYER2
         for(int i=0; i<=3;i++){
@@ -183,8 +183,8 @@ public class PolloTruco implements IPlayer, IAuto {
                    aux1=s.getAmazonMoves(p, false).size()*1;
                    heurPL2 = heurPL2 + aux + aux1;
                    */
-                   if (!s.getAmazonMoves(p, false).isEmpty()) enJoc2++;
-                   heurPL2+=amazonHeu(s, p)/*+(int)Math.pow(enJoc2,8)*/;
+                   /*if (!s.getAmazonMoves(p, false).isEmpty()) enJoc2++;*/
+                   heurPL2+=amazonHeu(s, p)/*+(int)Math.pow(10,7)*enJoc2*/;
         }  
         
         if (jugadr==CellType.PLAYER1){
