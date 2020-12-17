@@ -62,7 +62,7 @@ public class PolloTruco implements IPlayer, IAuto {
                                 if (mov_arrow.getPos(x, y)==CellType.EMPTY){
                                     mov_arrow.placeArrow(new Point(x, y));
                                     //System.out.print("BUSCA NOVA HURISTICA\n");
-                                    heu = MinValor(mov_arrow, prof-1, alfa, beta)*(profMax-prof+1);
+                                    heu = MinValor(mov_arrow, prof-1, alfa, beta)/**(profMax-prof+1)*/;
                                     if (valor < heu) {
                                         //System.out.print("NOVA HURISTICA\n");
                                         valor=heu;
@@ -203,25 +203,25 @@ public class PolloTruco implements IPlayer, IAuto {
         for (i=1; pos.x+i >= 0 && pos.x+i < s.getSize(); i++){
             if (s.getPos(pos.x+i, pos.y)==CellType.EMPTY){
                 //System.out.print("Entra "+((s.getSize()-(i-1)))+"\n");
-                valor += (int)Math.pow((s.getSize()-(i-1)),6);
+                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
             }
         }
         // Esquerra
         for (i=1; pos.x-i >= 0 && pos.x-i < s.getSize(); i++){
             if (s.getPos(pos.x-i, pos.y)==CellType.EMPTY){
-                valor += (int)Math.pow((s.getSize()-(i-1)),6);
+                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
             }
         }
         // Amunt
         for (i=1; pos.y+i >= 0 && pos.y+i < s.getSize(); i++){
             if (s.getPos(pos.x, pos.y+i)==CellType.EMPTY){
-                valor += (int)Math.pow((s.getSize()-(i-1)),6);
+                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
             }
         }
         // Abaix
         for (i=1; pos.y-i >= s.getSize() && pos.y-i < s.getSize(); i++){
             if (s.getPos(pos.x, pos.y-i)==CellType.EMPTY){
-                valor += (int)Math.pow((s.getSize()-(i-1)),6);
+                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
             }
         }
         
@@ -229,25 +229,25 @@ public class PolloTruco implements IPlayer, IAuto {
         // Dreta-Amunt
         for (i=1; pos.x+i >= 0 && pos.x+i < s.getSize() && pos.y-i >= 0 && pos.y-i < s.getSize(); i++){
             if (s.getPos(pos.x+i, pos.y-i)==CellType.EMPTY){
-                valor += (int)Math.pow((s.getSize()-(i-1)),6);
+                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
             }
         }
         // Dreta-Abaix
         for (i=1; pos.x+i >= 0 && pos.x+i < s.getSize() && pos.y+i >= 0 && pos.y+i < s.getSize(); i++){
             if (s.getPos(pos.x+i, pos.y+i)==CellType.EMPTY){
-                valor += (int)Math.pow((s.getSize()-(i-1)),6);
+                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
             }
         }
         // Esquerra-Abaix
         for (i=1; pos.x-i >= 0 && pos.x-i < s.getSize() && pos.y+i >= 0 && pos.y+i < s.getSize(); i++){
             if (s.getPos(pos.x-i, pos.y+i)==CellType.EMPTY){
-                valor += (int)Math.pow((s.getSize()-(i-1)),6);
+                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
             }
         }
         // Esquerra-Amunt
         for (i=1; pos.x-i >= 0 && pos.x-i < s.getSize() && pos.y-i >= 0 && pos.y-i < s.getSize(); i++){
             if (s.getPos(pos.x-i, pos.y-i)==CellType.EMPTY){
-                valor += (int)Math.pow((s.getSize()-(i-1)),6);
+                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
             }
         }
         
