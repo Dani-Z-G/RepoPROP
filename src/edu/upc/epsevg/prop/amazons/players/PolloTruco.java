@@ -21,31 +21,22 @@ public class PolloTruco implements IPlayer, IAuto {
     CellType jugadr;
     
     private String name;
-    //private GameStatus s;
-    
-    public PolloTruco (String name) {
-        this.name = name;
-    }
-    //setNumerOfNodesExplored​(long numerOfNodesExplored);
-
-    @Override
-    public void timeout() {
-        System.out.print("Timeout\n");
-        inTime=false;
-    } 
+    private int nodesExplorats;
    
     @Override
     public Move move(GameStatus s){
-        inTime=true;
+        
         CellType color = s.getCurrentPlayer();
-        jugadr = color;
-        int profMax = 100;
-        int valor = Integer.MIN_VALUE, heu;
+        int profMax = 100, valor = Integer.MIN_VALUE, heu, prof;
         Float alfa = Float.NEGATIVE_INFINITY, beta = Float.POSITIVE_INFINITY;
         Point queenFrom = new Point(0,0), queenTo = new Point(0,0), arrowTo = new Point(0,0);
+        
+        nodesExplorats=0;
+        inTime=true;
+        jugadr = color;
 
         // Profunditats de menys a més, ha de ser major a 0
-        for (int prof=1; prof <= profMax && inTime; prof++){
+        for (prof=1; prof <= profMax && inTime; prof++){
             // Todas las fichas del color
             for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
                Point pos = s.getAmazon(color, num);
@@ -61,10 +52,8 @@ public class PolloTruco implements IPlayer, IAuto {
                                 GameStatus mov_arrow = new GameStatus(mov_queen);
                                 if (mov_arrow.getPos(x, y)==CellType.EMPTY){
                                     mov_arrow.placeArrow(new Point(x, y));
-                                    //System.out.print("BUSCA NOVA HURISTICA\n");
-                                    heu = MinValor(mov_arrow, prof-1, alfa, beta)/**(profMax-prof+1)*/;
+                                    heu = MinValor(mov_arrow, prof-1, alfa, beta);
                                     if (valor < heu) {
-                                        //System.out.print("NOVA HURISTICA\n");
                                         valor=heu;
                                         queenFrom=pos;
                                         queenTo=arr.get(i);
@@ -76,15 +65,8 @@ public class PolloTruco implements IPlayer, IAuto {
                     }
                 }
             }
-           //System.out.print("Buscant en profunditat: "+prof+" \n");
         }
-        /*
-        //System.out.print("Amazonas: "+s.getNumberOfAmazonsForEachColor()+" \n");
-        System.out.print("Color Amazonas: "+color+" \n");
-        System.out.print("Lista Amazonas: "+s.getAmazon(color, 0)+" \n");
-        System.out.print("block: "+queenFrom+" "+queenTo+" "+arrowTo+" \n");
-        */
-        return new Move(queenFrom, queenTo, arrowTo, 0, 0, SearchType.MINIMAX);
+        return new Move(queenFrom, queenTo, arrowTo, nodesExplorats, prof-1, SearchType.MINIMAX);
     }
 
     private int MinValor(GameStatus s, int profunditat, float alfa, float beta){
@@ -93,7 +75,6 @@ public class PolloTruco implements IPlayer, IAuto {
             if (s.isGameOver()){
                 return Integer.MAX_VALUE;
             }
-            // get winner
             return heuristica(s, profunditat);
         }
         int valor = Integer.MIN_VALUE;
@@ -156,109 +137,55 @@ public class PolloTruco implements IPlayer, IAuto {
         return valor;
     }
 
-    public int heuristica(GameStatus s, int profunditat){
-        int heurPL1=0;
-        int heurPL2=0;
-        int heur=0;
-        int aux=0;
-        int aux1=0;
-        int enJoc1 = 0, enJoc2 = 0;
-    
+   public int heuristica(GameStatus s, int profunditat){
+        nodesExplorats++;
+        int heurPL1=0, heurPL2=0;
         //PLAYER1
         for(int i=0; i<=3;i++){
-                   Point p = s.getAmazon(CellType.PLAYER1,i);
-                   /*
-                   aux=s.getAmazonMoves(p, true).size()*4;
-                   aux1=s.getAmazonMoves(p, false).size()*1;
-                   heurPL1 = heurPL1 + aux + aux1;
-                   */
-                   /*if (!s.getAmazonMoves(p, false).isEmpty()) enJoc1++;*/
-                   heurPL1+=amazonHeu(s, p)/*+(int)Math.pow(10,7)*enJoc1*/;
+            Point p = s.getAmazon(CellType.PLAYER1,i);
+            int moves = s.getAmazonMoves(p, true).size();
+            heurPL1 += moves*6 + s.getAmazonMoves(p, false).size()*1;
+
+            if (moves == 0){
+                heurPL1 += -100;
+            }
+                   
         }
         //PLAYER2
         for(int i=0; i<=3;i++){
-                   Point p = s.getAmazon(CellType.PLAYER2,i);
-                   /*
-                   aux=s.getAmazonMoves(p, true).size()*4;
-                   aux1=s.getAmazonMoves(p, false).size()*1;
-                   heurPL2 = heurPL2 + aux + aux1;
-                   */
-                   /*if (!s.getAmazonMoves(p, false).isEmpty()) enJoc2++;*/
-                   heurPL2+=amazonHeu(s, p)/*+(int)Math.pow(10,7)*enJoc2*/;
-        }  
-        
-        if (jugadr==CellType.PLAYER1){
-            heur=heurPL1-heurPL2;
-        }else{
-            heur=heurPL2-heurPL1;
-        }
-        return heur;
-    }
+            Point p = s.getAmazon(CellType.PLAYER2,i);
+            int moves = s.getAmazonMoves(p, true).size();
+            heurPL2 += moves*6 + s.getAmazonMoves(p, false).size()*1;
 
-    private int amazonHeu(GameStatus s, Point pos){
-        int valor = 0, i = 0, dirs = 0;
+            if (moves == 0){
+                heurPL2 += -100;
+            }
+
+        }  
+        // prof % 2 == 0 -> Min
+        // prof % 2 != 0 -> Min
+        System.out.print("Profunditat: "+profunditat+"\n");
+        System.out.print(s.toString());
         
-        // ==== RECTES ====
-        // Dreta
-        for (i=1; pos.x+i >= 0 && pos.x+i < s.getSize(); i++){
-            if (s.getPos(pos.x+i, pos.y)==CellType.EMPTY){
-                //System.out.print("Entra "+((s.getSize()-(i-1)))+"\n");
-                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
-            }
+        if (jugadr==CellType.PLAYER2){
+            return heurPL2-heurPL1;
+        }else{
+            return heurPL1-heurPL2;
         }
-        // Esquerra
-        for (i=1; pos.x-i >= 0 && pos.x-i < s.getSize(); i++){
-            if (s.getPos(pos.x-i, pos.y)==CellType.EMPTY){
-                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
-            }
-        }
-        // Amunt
-        for (i=1; pos.y+i >= 0 && pos.y+i < s.getSize(); i++){
-            if (s.getPos(pos.x, pos.y+i)==CellType.EMPTY){
-                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
-            }
-        }
-        // Abaix
-        for (i=1; pos.y-i >= s.getSize() && pos.y-i < s.getSize(); i++){
-            if (s.getPos(pos.x, pos.y-i)==CellType.EMPTY){
-                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
-            }
-        }
-        
-        // ==== DIAGONALS ====
-        // Dreta-Amunt
-        for (i=1; pos.x+i >= 0 && pos.x+i < s.getSize() && pos.y-i >= 0 && pos.y-i < s.getSize(); i++){
-            if (s.getPos(pos.x+i, pos.y-i)==CellType.EMPTY){
-                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
-            }
-        }
-        // Dreta-Abaix
-        for (i=1; pos.x+i >= 0 && pos.x+i < s.getSize() && pos.y+i >= 0 && pos.y+i < s.getSize(); i++){
-            if (s.getPos(pos.x+i, pos.y+i)==CellType.EMPTY){
-                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
-            }
-        }
-        // Esquerra-Abaix
-        for (i=1; pos.x-i >= 0 && pos.x-i < s.getSize() && pos.y+i >= 0 && pos.y+i < s.getSize(); i++){
-            if (s.getPos(pos.x-i, pos.y+i)==CellType.EMPTY){
-                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
-            }
-        }
-        // Esquerra-Amunt
-        for (i=1; pos.x-i >= 0 && pos.x-i < s.getSize() && pos.y-i >= 0 && pos.y-i < s.getSize(); i++){
-            if (s.getPos(pos.x-i, pos.y-i)==CellType.EMPTY){
-                valor += (int)Math.pow(10,(s.getSize()-(i-1))); 
-            }
-        }
-        
-        //System.out.print("Valor: "+valor+" \n");
-        //return valor*s.getAmazonMoves(pos, false).size();
-        return valor;
-    }
+    } 
     
     @Override
     public String getName() {
         return name;
     }
+    
+    @Override
+    public void timeout() {
+        System.out.print("Timeout\n");
+        inTime=false;
+    }
+    
+    public PolloTruco (String name) {
+        this.name = name;
+    }
 }
- 
