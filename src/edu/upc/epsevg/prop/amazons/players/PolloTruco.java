@@ -78,6 +78,10 @@ public class PolloTruco implements IPlayer, IAuto {
             return heuristica(s, profunditat);
         }
         int valor = Integer.MIN_VALUE;
+        
+        int aux=0;
+        GameStatus nou = new GameStatus(s);
+        
         for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
             Point pos = s.getAmazon(color, num);
             ArrayList<Point> arr = s.getAmazonMoves(pos, false);
@@ -92,6 +96,12 @@ public class PolloTruco implements IPlayer, IAuto {
                             mov_arrow.placeArrow(new Point(x, y));
                            
                             valor = Math.min(valor, MaxValor(mov_arrow, profunditat-1, alfa, beta));
+                            
+                            if (valor>aux){                           
+                                System.out.print("Profunditat: "+profunditat+"\n");
+                                nou = new GameStatus(s);
+                            }
+                            aux = valor;
                             
                             beta=Math.min(valor,beta);
                             if(beta<=alfa) return valor;
@@ -112,6 +122,7 @@ public class PolloTruco implements IPlayer, IAuto {
             return heuristica(s, profunditat);
         }
         int valor = Integer.MAX_VALUE;
+        
         for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
             Point pos = s.getAmazon(color, num);
             ArrayList<Point> arr = s.getAmazonMoves(pos, false);
@@ -126,7 +137,7 @@ public class PolloTruco implements IPlayer, IAuto {
                             mov_arrow.placeArrow(new Point(x, y));
                 
                             valor = Math.max(valor, MinValor(mov_arrow, profunditat-1, alfa, beta));
-                            
+
                             alfa=Math.max(valor,alfa);
                             if(beta<=alfa) return valor;
                         }
@@ -145,28 +156,21 @@ public class PolloTruco implements IPlayer, IAuto {
             Point p = s.getAmazon(CellType.PLAYER1,i);
             int moves = s.getAmazonMoves(p, true).size();
             heurPL1 += moves*6 + s.getAmazonMoves(p, false).size()*1;
-
+            // Penalitzem si tenim alguna fitxa sense moviments
             if (moves == 0){
                 heurPL1 += -100;
             }
-                   
         }
         //PLAYER2
         for(int i=0; i<=3;i++){
             Point p = s.getAmazon(CellType.PLAYER2,i);
             int moves = s.getAmazonMoves(p, true).size();
             heurPL2 += moves*6 + s.getAmazonMoves(p, false).size()*1;
-
+            // Penalitzem si tenim alguna fitxa sense moviments
             if (moves == 0){
                 heurPL2 += -100;
             }
-
-        }  
-        // prof % 2 == 0 -> Min
-        // prof % 2 != 0 -> Min
-        System.out.print("Profunditat: "+profunditat+"\n");
-        System.out.print(s.toString());
-        
+        }          
         if (jugadr==CellType.PLAYER2){
             return heurPL2-heurPL1;
         }else{
