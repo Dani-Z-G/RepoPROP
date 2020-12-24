@@ -93,8 +93,8 @@ public class PolloTruco implements IPlayer, IAuto {
                            
                             valor = Math.min(valor, MaxValor(mov_arrow, profunditat-1, alfa, beta));
                             
-                            //beta=Math.min(valor,beta);
-                            //if(beta<=alfa) return valor;
+                            beta=Math.min(valor,beta);
+                            if(beta<=alfa) return valor;
                         }
                     }
                 }
@@ -135,7 +135,7 @@ public class PolloTruco implements IPlayer, IAuto {
         return valor;
     }
 
-   public int heuristica(GameStatus s, int profunditat){
+    private int heuristica(GameStatus s, int profunditat){
         nodesExplorats++;
         int heurPL1=0, heurPL2=0; 
         
