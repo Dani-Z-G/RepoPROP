@@ -151,30 +151,25 @@ public class PolloTruco implements IPlayer, IAuto {
         }
        
         //PLAYER Inicial
-       for(int i=0; i<=3;i++){
+        for(int i=0; i<=3;i++){
            Point p = s.getAmazon(colCurr,i);
            int moves = s.getAmazonMoves(p, true).size();
            heurPL1 += moves*6 + s.getAmazonMoves(p, false).size()*1;
            // Penalitzem si tenim alguna fitxa sense moviments
-           if (moves == 0){
-               heurPL1 += -100;
-           }
-       }
+           if (moves == 0) heurPL1 += -100;
+        }
 
-       //PLAYER Contrari
-       for(int i=0; i<=3;i++){
+        //PLAYER Contrari
+        for(int i=0; i<=3;i++){
            Point p = s.getAmazon(colOpp,i);
            int moves = s.getAmazonMoves(p, true).size();
            heurPL2 += moves*6 + s.getAmazonMoves(p, false).size()*1;
            // Penalitzem si tenim alguna fitxa sense moviments
-           if (moves == 0){
-               heurPL2 += -80;
-           }
-       }
+           if (moves == 0) heurPL2 += -100;
+        }
         
-        // Retornem el valor segons si beneficia al jugador o no
-        int heur=heurPL1-heurPL2;
-        return heur;
+        // Retornem la diferencia d'heuristica
+        return heurPL1-heurPL2;
     } 
     
     @Override
