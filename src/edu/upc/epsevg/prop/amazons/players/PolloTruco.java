@@ -37,7 +37,7 @@ public class PolloTruco implements IPlayer, IAuto {
         jugadr = color;
 
         // Profunditats de menys a més, ha de ser major a 0
-        for (prof=1; prof <= profMax; prof++){
+        for (prof=1; prof <= profMax && inTime; prof++){
             // Todas las fichas del color
             for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
                Point pos = s.getAmazon(color, num);
@@ -55,6 +55,7 @@ public class PolloTruco implements IPlayer, IAuto {
                                     mov_arrow.placeArrow(new Point(x, y));
                                     if(inTime) heu = MinValor(mov_arrow, prof-1, alfa, beta);
                                     if (valor < heu) {
+                                        System.out.print("Nova heu: "+prof+"\n");
                                         valor=heu;
                                         queenFrom=pos;
                                         queenTo=arr.get(i);
@@ -73,11 +74,7 @@ public class PolloTruco implements IPlayer, IAuto {
     private int MinValor(GameStatus s, int profunditat, float alfa, float beta){
         CellType color = s.getCurrentPlayer();
         int valor = 1000000; 
-        //if (color == jugadr) color= opposite(jugadr);
         if (profunditat == 0 || s.isGameOver()) {
-            //if (s.isGameOver()){
-            //   return -1000000;
-            //}
             return heuristica(s, profunditat);
         }
        
@@ -109,15 +106,10 @@ public class PolloTruco implements IPlayer, IAuto {
     private int MaxValor(GameStatus s, int profunditat, float alfa, float beta){
         CellType color = s.getCurrentPlayer();
         int valor = -1000000;
-        //if (color != jugadr) color=jugadr;
         if (profunditat == 0 || s.isGameOver()) {
-           // if (s.isGameOver()){
-            //    return 1000000;
-            //}
             return heuristica(s, profunditat);
         }
        
-        
         for (int num = 0; num < s.getNumberOfAmazonsForEachColor(); ++num) {
             Point pos = s.getAmazon(color, num);
             ArrayList<Point> arr = s.getAmazonMoves(pos, false);
@@ -145,38 +137,42 @@ public class PolloTruco implements IPlayer, IAuto {
 
    public int heuristica(GameStatus s, int profunditat){
         nodesExplorats++;
-        int heurPL1=0, heurPL2=0;
-        CellType color_contrari, color = jugadr;
-        if (color == CellType.PLAYER1) color_contrari = CellType.PLAYER2;
-        else color_contrari = CellType.PLAYER1;
-        //if(color==jugadr && s.isGameOver()) return 100000;
-        //else if(color!=jugadr && s.isGameOver()) return -100000;
-        //PLAYER1
+        int heurPL1=0, heurPL2=0; 
         
-            for(int i=0; i<=3;i++){
-                Point p = s.getAmazon(color,i);
-                int moves = s.getAmazonMoves(p, true).size();
-                heurPL1 += moves*6 + s.getAmazonMoves(p, false).size()*1;
-                // Penalitzem si tenim alguna fitxa sense moviments
-                if (moves == 0){
-                    heurPL1 += -100;
-                }
-            }
-            
-            //PLAYER2
-            for(int i=0; i<=3;i++){
-                Point p = s.getAmazon(color_contrari,i);
-                int moves = s.getAmazonMoves(p, true).size();
-                heurPL2 += moves*6 + s.getAmazonMoves(p, false).size()*1;
-                // Penalitzem si tenim alguna fitxa sense moviments
-                if (moves == 0){
-                    heurPL2 += -100;
-                }
-            }
+        CellType colCurr = jugadr;
+        CellType colOpp = opposite(jugadr);
+             
+        if (s.isGameOver()){
+           if (s.GetWinner() == colCurr){
+               return 1000000;
+           }else{
+               return -1000000;
+           }
+        }
+       
+        //PLAYER Inicial
+       for(int i=0; i<=3;i++){
+           Point p = s.getAmazon(colCurr,i);
+           int moves = s.getAmazonMoves(p, true).size();
+           heurPL1 += moves*6 + s.getAmazonMoves(p, false).size()*1;
+           // Penalitzem si tenim alguna fitxa sense moviments
+           if (moves == 0){
+               heurPL1 += -100;
+           }
+       }
+
+       //PLAYER Contrari
+       for(int i=0; i<=3;i++){
+           Point p = s.getAmazon(colOpp,i);
+           int moves = s.getAmazonMoves(p, true).size();
+           heurPL2 += moves*6 + s.getAmazonMoves(p, false).size()*1;
+           // Penalitzem si tenim alguna fitxa sense moviments
+           if (moves == 0){
+               heurPL2 += -80;
+           }
+       }
         
         // Retornem el valor segons si beneficia al jugador o no
-      
-        
         int heur=heurPL1-heurPL2;
         return heur;
     } 
